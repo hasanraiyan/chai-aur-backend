@@ -1,5 +1,12 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs"
+import dotenv from "dotenv"
+import { publicDecrypt } from 'crypto';
+
+dotenv.config({
+    path: "./src/.env",
+    credentials: true
+});
 
 // Configuration
 cloudinary.config({
@@ -8,9 +15,14 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+
 const uploadOnCLoudinary = async (localFilePath) => {
     try {
-        if (!localFilePath) return null
+        if (!localFilePath){
+            console.log("local file not found")
+            return null
+        }
+        
         // Upload an image
         const response = await cloudinary.uploader
             .upload(
@@ -33,4 +45,13 @@ const uploadOnCLoudinary = async (localFilePath) => {
     }
 }
 
-export { uploadOnCLoudinary }
+const deleteFromCloudinary = async(publicId) => {
+    try {
+        const result = await  cloudinary.uploader.destroy(publicId);
+        console.log("Deleted from the claudinary")
+    } catch (error) {
+        console.log("Error deleting from the cloudinary", error)
+    }
+}
+
+export { uploadOnCLoudinary, deleteFromCloudinary }
